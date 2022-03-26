@@ -3,24 +3,19 @@ FROM openjdk:11-jre-slim
 USER root
 RUN groupadd -g 550 appuser && useradd -r -m -u 1000 -g appuser appuser
 
-ENV AWS_INSTALL /usr/local/aws-cli
-ENV	AWS_BIN	/usr/local/bin
-ENV	AWS_DOWNLOAD_URL "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip"
+ENV PYTHONUNBUFFERED=1
 
-RUN  mkdir -p /tmp/dependencies
-ADD ${AWS_DOWNLOAD_URL}  /tmp/dependencies/awscliv2.zip
+RUN apt-get update && apt-get --assume-yes install python3 \
+&& apt-get --assume-yes install python3-pip
 
-RUN apt-get update && apt-get install unzip
-RUN	unzip /tmp/dependencies/awscliv2.zip
+RUN ln -s -f python3 /usr/bin/python
 
-RUN rm /tmp/dependencies/awscliv2.zip
+RUN pip3 install --no-cache --upgrade \
+pip \
+setuptools \
+awscli
 
-RUN ./aws/install
-
-RUN chmod -R 777 ${AWS_INSTALL}
-RUN chmod -R 777 ${AWS_BIN}
-
-ENV PATH $PATH:$AWS_INSTALL
+RUN apt-get --assume-yes autoremove python3-pip && apt-get clean
 
 USER appuser
 
