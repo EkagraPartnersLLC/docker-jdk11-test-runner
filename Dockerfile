@@ -15,6 +15,9 @@ pip \
 setuptools \
 awscli
 
+#CVE https://security-tracker.debian.org/tracker/CVE-2022-23219
+RUN apt-get --only-upgrade install libc-bin=2.31-13+deb11u3
+
 RUN apt-get --assume-yes autoremove python3-pip && apt-get clean
 
 USER appuser
